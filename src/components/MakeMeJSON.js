@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import DragDrop from "./DragDrop";
 import { Paper } from "@mui/material";
+import { useHistory } from "react-router-dom";
 import InlineFeedback from "./InlineFeedback";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
 
@@ -13,8 +14,11 @@ export default function MakeMeJSON({
   existingInstruments,
   ReactGA,
 }) {
+  const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
+  const [grouping, setGrouping] = useState("");
+  const history = useHistory();
 
   function saveFile(blob, filename) {
     if (window.navigator.msSaveOrOpenBlob) {
