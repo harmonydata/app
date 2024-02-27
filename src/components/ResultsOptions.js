@@ -36,7 +36,7 @@ export default function ResultsOptions({
     setSearchTerm(resultsOptions.searchTerm);
   }, [resultsOptions]);
 
-  useMemo((resultsOptions, setResultsOptions) => {
+  useMemo(() => {
     let thisOptions = { ...resultsOptions };
     thisOptions.searchTerm = debouncedSearchTerm;
     setResultsOptions(thisOptions);

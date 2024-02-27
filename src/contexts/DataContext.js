@@ -78,8 +78,8 @@ export function DataProvider({ children }) {
     harmonisation.uid = currentUser.uid;
     // if docID is specified check it is owned by current user
     if (docID) {
-      const docu = await getDoc(doc(db, "harmonisations", docID));
-      if (docu.exists() && docu.data.uid !== currentUser.uid) {
+      const doc = await getDoc(doc(db, "harmonisations", docID));
+      if (doc.exists() && doc.data.uid != currentUser.uid) {
         Promise.reject(Error(`Specified docID is not owned by current user`));
       }
       harmonisation.updated = serverTimestamp();
@@ -117,28 +117,24 @@ export function DataProvider({ children }) {
     return addDoc(collection(db, "mismatches"), m);
   };
   const prepForFireStore = (harmonisation) => {
-    harmonisation.apiData.instruments.map((instrument) => (
-      instrument.questions.map((question) => (
+    harmonisation.apiData.instruments.map((instrument) => {
+      instrument.questions.map((question) => {
         //This is a circular reference but can't be stored
-        delete question["instrument"]
-        )
-      )
-    )
-    );
+        delete question["instrument"];
+      });
+    });
     harmonisation.apiData = JSON.parse(JSON.stringify(harmonisation.apiData));
     console.log("prepped");
     console.log(harmonisation);
     return harmonisation;
   };
   const undoPrepForFireStore = (harmonisation) => {
-    harmonisation.apiData.instruments.map((instrument) => (
-      instrument.questions.map((question) => (
+    harmonisation.apiData.instruments.map((instrument) => {
+      instrument.questions.map((question) => {
         //This is a circular reference but can't be stored
-        question["instrument"] = instrument
-        )
-      )
-    )
-    );
+        question["instrument"] = instrument;
+      });
+    });
     console.log("unprepped");
     console.log(harmonisation);
     return harmonisation;

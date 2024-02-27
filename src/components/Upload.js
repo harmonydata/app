@@ -21,6 +21,7 @@ import {
   AddCircleOutline as AddCircleOutlineIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
+  Rowing,
 } from "@mui/icons-material";
 import { useHistory } from "react-router-dom";
 import InlineFeedback from "./InlineFeedback";
@@ -40,7 +41,7 @@ export default function Upload({
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
-  const [grouping] = useState("");
+  const [grouping, setGrouping] = useState("");
   const [expanded, setExpanded] = useState(false);
   const dirty = useRef(false);
   const localFileInfos = useRef();
@@ -61,11 +62,20 @@ export default function Upload({
     localFileInfos.current = fi;
   }, []);
 
-  const syncFileInfos = useCallback((setAppFileInfos) => {
+  const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
     setAppFileInfos(localFileInfos.current);
     dirty.current = false;
-  }, []);
+  });
+
+  const getFileInfo = useCallback(
+    (instrument_id) => {
+      return fileInfos.filter((fi) => {
+        return fi.instrument_id === instrument_id;
+      })[0];
+    },
+    [fileInfos]
+  );
 
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
@@ -172,12 +182,10 @@ export default function Upload({
           !existingInstrumentIDs.includes(fi.instrument_id)
         ) {
           return fi;
-        } else {
-          return null
         }
       })
       .filter((i) => {
-        return i !== null;
+        return i;
       });
 
     // add in any selected which are not already in there
@@ -366,7 +374,7 @@ export default function Upload({
   const FileInfo = ({ fi }) => {
     const instrument_id = fi.instrument_id;
     const fileInfo = fi;
-    const [, rerender] = useState();
+    const [_, rerender] = useState();
     console.log("rendering " + instrument_id + fileInfo.instrument_name);
     return (
       <Accordion
