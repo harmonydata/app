@@ -83,7 +83,7 @@ function DragDrop({
           <Box>
             <Typography>
               <Link>Upload</Link> or drag and drop one or more questionnaires
-              here. Files can be in <b>pdf, csv, txt, docx or xlsx</b> format (
+              here. Files can be in <b>pdf, csv, txt, docx, html or xlsx</b> format (
               <Link
                 onClickCapture={(e) => {
                   e.nativeEvent.stopPropagation();
