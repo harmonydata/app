@@ -36,6 +36,7 @@ import "react-toastify/dist/ReactToastify.css";
 import YouTube from "react-youtube";
 import "../css/youtube.css";
 import { useHistory } from "react-router-dom";
+import { jsPDF } from "jspdf";
 
 function App() {
   const history = useHistory();
@@ -305,6 +306,78 @@ function App() {
     XLSXwriteFile(workbook, "Harmony.xlsx");
   };
 
+
+
+  const downloadPDF = async () => {
+    setTimeout(ratingToast, 1000);
+
+    try {
+        const doc = new jsPDF();
+        
+        doc.setFontSize(24);
+        doc.text('Harmony Data Report', 105, 20, { align: 'center' });
+
+        // Prepare summary data for the first table
+        const summaryData = [
+            ['Total Instruments', apiData.instruments.length],
+            ['Total Matches', computedMatches.length],
+            ['Selected Matches', computedMatches.filter(m => m.selected).length],
+            ['Match Threshold', `${resultsOptions.threshold[0]}%`]
+        ];
+
+        // Add summary table to the PDF
+        doc.autoTable({
+            startY: 30,
+            body: summaryData,
+            theme: 'plain',
+            margin: { left: 20 },
+            styles: { fontSize: 12 }
+        });
+
+        // Prepare detailed match data for the second table
+        const matchesTableData = computedMatches.map(match => {
+            const q1 = getQuestion(match.qi);
+            const q2 = getQuestion(match.mqi);
+            return [
+                q1.question_text,
+                q1.instrument.name,
+                q2.question_text,
+                q2.instrument.name,
+                `${(match.match * 100).toFixed(1)}%`
+            ];
+        });
+
+        // Add matches table to the PDF
+        doc.autoTable({
+            startY: doc.autoTable.previous.finalY + 10,
+            head: [['Question 1', 'Instrument 1', 'Question 2', 'Instrument 2', 'Score']],
+            body: matchesTableData,
+            theme: 'grid',
+            headStyles: { fillColor: [33, 69, 237], textColor: 255, fontSize: 12 },
+            styles: { overflow: 'linebreak', cellWidth: 'wrap', fontSize: 10 }
+        });
+
+        doc.save('harmony_matches.pdf');
+
+        ReactGA?.event({
+            category: "Actions",
+            action: "Export PDF"
+        });
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error('Failed to generate PDF report');
+    }
+  };
+
+
+  
+
+
+
+
+
+
   let theme = useMemo(
     () =>
       createTheme(deepmerge(getDesignTokens(mode), getThemedComponents(mode))),
@@ -366,6 +439,7 @@ function App() {
                     makePublicShareLink={makePublicShareLink}
                     saveToMyHarmony={saveToMyHarmony}
                     downloadExcel={downloadExcel}
+                    downloadPDF={downloadPDF}
                     toaster={toast}
                     ReactGA={ReactGA}
                   />
