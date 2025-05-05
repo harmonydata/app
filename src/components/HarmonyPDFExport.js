@@ -53,28 +53,39 @@ export class HarmonyPDFExport {
   }
 
   addMatchesTable(matches, selectedMatches) {
-    const tableData = matches.map(match => [
+    const tableBody = matches.map(match => [
       match.question1.question_text,
       match.question1.instrument_name,
       match.question2.question_text,
       match.question2.instrument_name,
       `${(match.score * 100).toFixed(1)}%`
     ]);
-
+  
     this.doc.autoTable({
-      startY: this.doc.autoTable.previous.finalY + 20,
+      startY: this.doc.lastAutoTable ? this.doc.lastAutoTable.finalY + 20 : 60,
       head: [['Question 1', 'Instrument 1', 'Question 2', 'Instrument 2', 'Score']],
-      body: tableData,
+      body: tableBody,
       theme: 'grid',
-      headStyles: { 
+      styles: {
+        fontSize: 9,
+        overflow: 'linebreak',
+        cellPadding: 2,
+      },
+      columnStyles: {
+        0: { cellWidth: 60 }, // Question 1
+        1: { cellWidth: 30 }, // Instrument 1
+        2: { cellWidth: 60 }, // Question 2
+        3: { cellWidth: 30 }, // Instrument 2
+        4: { cellWidth: 20 }, // Score
+      },
+      headStyles: {
         fillColor: [33, 69, 237],
         textColor: 255,
-        fontSize: 12
-      },
-      styles: { 
-        overflow: 'linebreak',
-        cellWidth: 'wrap',
         fontSize: 10
+      },
+      didDrawPage: (data) => {
+        this.doc.setFontSize(10);
+        this.doc.text(`Page ${this.doc.internal.getNumberOfPages()}`, this.doc.internal.pageSize.getWidth() - 20, this.doc.internal.pageSize.getHeight() - 10, { align: 'right' });
       }
     });
   }
