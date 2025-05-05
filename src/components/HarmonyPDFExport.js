@@ -1,17 +1,13 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { applyPlugin } from 'jspdf-autotable'
 import { format } from 'date-fns';
 
-
-
+applyPlugin(jsPDF)
 
 export class HarmonyPDFExport {
 constructor(JsPdfClass = jsPDF) {
   this.doc = new JsPdfClass()
 }
-
-
-
 
 async generateReport(data) {
   const {
@@ -20,9 +16,6 @@ async generateReport(data) {
     threshold,
     selectedMatches = []
   } = data;
-
-
-
 
   // Header
   this.doc.setFontSize(24);
@@ -35,20 +28,11 @@ async generateReport(data) {
     threshold
   });
 
-
-
-
   // Matches table
   this.addMatchesTable(matches, selectedMatches);
 
-
-
-
   return this.doc.output('blob');
 }
-
-
-
 
 addSummarySection(summary) {
   const summaryData = [
@@ -59,9 +43,6 @@ addSummarySection(summary) {
     ['Match Threshold', `${summary.threshold}%`]
   ];
 
-
-
-
   this.doc.autoTable({
     startY: 30,
     head: [],
@@ -71,9 +52,6 @@ addSummarySection(summary) {
     styles: { fontSize: 12 }
   });
 }
-
-
-
 
 addMatchesTable(matches, selectedMatches) {
   const tableBody = matches.map(match => [
@@ -94,9 +72,9 @@ addMatchesTable(matches, selectedMatches) {
       cellPadding: 2,
     },
     columnStyles: {
-      0: { cellWidth: 60 }, // Question 1
+      0: { cellWidth: 50 }, // Question 1
       1: { cellWidth: 30 }, // Instrument 1
-      2: { cellWidth: 60 }, // Question 2
+      2: { cellWidth: 50 }, // Question 2
       3: { cellWidth: 30 }, // Instrument 2
       4: { cellWidth: 20 }, // Score
     },

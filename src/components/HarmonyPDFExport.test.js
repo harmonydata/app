@@ -15,11 +15,11 @@ jest.mock('jspdf', () => {
     return { __esModule: true, default: jest.fn().mockImplementation(fakeImpl) };
   });
   
- jest.mock('jspdf-autotable', () => ({}));
- 
+ jest.mock('jspdf-autotable', () => ({
+    applyPlugin: jest.fn()
+ }));
  
  const { HarmonyPDFExport } = require('./HarmonyPDFExport');
- 
  
  describe('HarmonyPDFExport', () => {
     let fakeDoc, FakeJsPDF, exporter
