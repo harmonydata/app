@@ -11,6 +11,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { ReactComponent as xlsxSVG } from "../img/file-excel-solid.svg";
+import { ReactComponent as pdfSVG } from "../img/file-pdf-solid.svg";
 import DropdownShareButton from "./DropdownShareButton";
 import SvgIcon from "@mui/material/SvgIcon";
 import { useAuth } from "../contexts/AuthContext";
@@ -23,6 +24,7 @@ export default function ResultsOptions({
   makePublicShareLink,
   saveToMyHarmony,
   downloadExcel,
+  downloadPDF,
   ReactGA,
   toaster,
 }) {
@@ -174,7 +176,21 @@ export default function ResultsOptions({
             }}
           >
             <SvgIcon component={xlsxSVG} inheritViewBox />
-            <Typography> Export</Typography>
+            <Typography> Export Excel</Typography>
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              ReactGA &&
+                ReactGA.event({
+                  category: "Actions",
+                  action: "Export PDF",
+                });
+              downloadPDF();
+            }}
+          >
+            <SvgIcon component={pdfSVG} inheritViewBox />
+            <Typography> Export PDF </Typography>
           </Button>
         </Stack>
       </Stack>

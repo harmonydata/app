@@ -36,6 +36,7 @@ import "react-toastify/dist/ReactToastify.css";
 import YouTube from "react-youtube";
 import "../css/youtube.css";
 import { useHistory } from "react-router-dom";
+import { HarmonyPDFExport } from "./HarmonyPDFExport.js";
 
 function App() {
   const history = useHistory();
@@ -322,6 +323,39 @@ function App() {
     XLSXwriteFile(workbook, "Harmony.xlsx");
   };
 
+  const downloadPDF = async () => {
+    setTimeout(ratingToast, 1000);
+
+    const pdfData = {
+      matches: computedMatches.map(cm => {
+        const q = getQuestion(cm.qi);
+        const mq = getQuestion(cm.mqi);
+        return {
+          question1: {
+            question_text: q.question_text,
+            instrument_name: q.instrument.name
+          },
+          question2: {
+            question_text: mq.question_text,
+            instrument_name: mq.instrument.name
+          },
+          score: cm.match
+        };
+      }),
+      instruments: apiData.instruments,
+      threshold: resultsOptions.threshold[0],
+      selectedMatches: computedMatches.filter(m => m.selected)
+    };
+
+    const pdfExport = new HarmonyPDFExport();
+    const pdfBlob = await pdfExport.generateReport(pdfData);
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Harmony.pdf';
+    link.click();
+  };
+
   let theme = useMemo(
     () =>
       createTheme(deepmerge(getDesignTokens(mode), getThemedComponents(mode))),
@@ -383,6 +417,7 @@ function App() {
                     makePublicShareLink={makePublicShareLink}
                     saveToMyHarmony={saveToMyHarmony}
                     downloadExcel={downloadExcel}
+                    downloadPDF={downloadPDF}
                     toaster={toast}
                     ReactGA={ReactGA}
                   />
