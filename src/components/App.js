@@ -317,6 +317,18 @@ function App() {
     XLSXutils.book_append_sheet(workbook, matches, "Matches");
     XLSXutils.book_append_sheet(workbook, matrix, "Matrix");
     XLSXwriteFile(workbook, "Harmony.xlsx");
+
+    // Add Jupyter Notebook download for processing results on local machine
+    downloadJupyterNotebook();
+  };
+
+  const downloadJupyterNotebook = () => {
+    const link = document.createElement('a');
+    link.href = process.env.PUBLIC_URL + '/processdata/harmony_process_data.ipynb';
+    link.download = 'harmony_process_data.ipynb';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   let theme = useMemo(
