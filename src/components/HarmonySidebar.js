@@ -21,6 +21,7 @@ import { Logout, JoinInner } from "@mui/icons-material/";
 import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import ComingSoonDialog from "./ComingSoonDialog";
 
 // Get current domain for dynamic links
 const getCurrentDomain = () => {
@@ -106,6 +107,8 @@ export default function HarmonySidebar() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [anchorUser, setAnchorUser] = useState(null);
   const [apiVersion, setApiVersion] = useState(null);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [comingSoonFeature, setComingSoonFeature] = useState("");
 
   const {
     currentUser,
@@ -115,6 +118,16 @@ export default function HarmonySidebar() {
     signInWithTwitter,
   } = useAuth();
   const { getVersion } = useData();
+
+  const handleNavigationClick = (e, item) => {
+    // For Browse, Explore, Compare, and Saves, show coming soon dialog
+    if (["Browse", "Explore", "Compare", "Saves"].includes(item.text)) {
+      e.preventDefault();
+      setComingSoonFeature(item.text);
+      setComingSoonOpen(true);
+    }
+    // Search and Harmonise should work normally
+  };
 
   // Determine if an item is active
   const isActive = (item) => {
@@ -215,11 +228,17 @@ export default function HarmonySidebar() {
 
             return (
               <ListItemButton
-                disabled={isExternal}
+                disabled={
+                  item.text !== "Search" &&
+                  ["Browse", "Explore", "Compare", "Saves"].includes(item.text)
+                    ? false
+                    : isExternal
+                }
                 key={item.text}
                 component={isExternal ? "a" : Link}
                 href={isExternal ? item.href : undefined}
                 to={isExternal ? undefined : item.href}
+                onClick={(e) => handleNavigationClick(e, item)}
                 selected={isActive(item)}
                 sx={{
                   flexDirection: "column",
@@ -365,10 +384,18 @@ export default function HarmonySidebar() {
             return (
               <ListItem key={item.text} disablePadding>
                 <ListItemButton
-                  disabled={isExternal}
+                  disabled={
+                    item.text !== "Search" &&
+                    ["Browse", "Explore", "Compare", "Saves"].includes(
+                      item.text
+                    )
+                      ? false
+                      : isExternal
+                  }
                   component={isExternal ? "a" : Link}
                   href={isExternal ? item.href : undefined}
                   to={isExternal ? undefined : item.href}
+                  onClick={(e) => handleNavigationClick(e, item)}
                   selected={isActive(item)}
                   sx={{
                     minHeight: 48,
@@ -594,6 +621,11 @@ export default function HarmonySidebar() {
           </Menu>
         </Box>
       </Box>
+      <ComingSoonDialog
+        open={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        featureName={comingSoonFeature}
+      />
     </>
   );
 }
