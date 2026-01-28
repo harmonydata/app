@@ -228,12 +228,7 @@ export default function HarmonySidebar() {
 
             return (
               <ListItemButton
-                disabled={
-                  item.text !== "Search" &&
-                  ["Browse", "Explore", "Compare", "Saves"].includes(item.text)
-                    ? false
-                    : isExternal
-                }
+
                 key={item.text}
                 component={isExternal ? "a" : Link}
                 href={isExternal ? item.href : undefined}
@@ -384,14 +379,8 @@ export default function HarmonySidebar() {
             return (
               <ListItem key={item.text} disablePadding>
                 <ListItemButton
-                  disabled={
-                    item.text !== "Search" &&
-                    ["Browse", "Explore", "Compare", "Saves"].includes(
-                      item.text
-                    )
-                      ? false
-                      : isExternal
-                  }
+                 
+                
                   component={isExternal ? "a" : Link}
                   href={isExternal ? item.href : undefined}
                   to={isExternal ? undefined : item.href}
