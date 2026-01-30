@@ -204,7 +204,7 @@ export default function HarmonySidebar() {
             alignItems: "center",
           }}
         >
-          <a href="https://harmonydata.ac.uk" style={{ textDecoration: "none" }}>
+          <a href="https://harmonydata.ac.uk" target="harmonyHome" style={{ textDecoration: "none" }}>
             <img
               src="/app/harmony.png"
               alt="Harmony Logo"
@@ -353,7 +353,7 @@ export default function HarmonySidebar() {
       >
         {/* Logo */}
         <Box sx={{ p: 1, pt: 3, display: "flex", justifyContent: "center" }}>
-          <a href="https://harmonydata.ac.uk" style={{ textDecoration: "none" }}>
+          <a href="https://harmonydata.ac.uk" target="harmonyHome" style={{ textDecoration: "none" }}>
             <img
               src="/app/harmony.png"
               alt="Harmony Logo"
