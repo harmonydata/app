@@ -204,7 +204,7 @@ export default function HarmonySidebar() {
             alignItems: "center",
           }}
         >
-          <Link to="/app/" style={{ textDecoration: "none" }}>
+          <a href="https://harmonydata.ac.uk" target="harmonyHome" style={{ textDecoration: "none" }}>
             <img
               src="/app/harmony.png"
               alt="Harmony Logo"
@@ -212,7 +212,7 @@ export default function HarmonySidebar() {
               height={40}
               style={{ objectFit: "contain" }}
             />
-          </Link>
+          </a>
         </Box>
 
         {/* Navigation Items - Hidden on mobile, moved to avatar menu */}
@@ -353,7 +353,7 @@ export default function HarmonySidebar() {
       >
         {/* Logo */}
         <Box sx={{ p: 1, pt: 3, display: "flex", justifyContent: "center" }}>
-          <Link to="/app/" style={{ textDecoration: "none" }}>
+          <a href="https://harmonydata.ac.uk" target="harmonyHome" style={{ textDecoration: "none" }}>
             <img
               src="/app/harmony.png"
               alt="Harmony Logo"
@@ -361,7 +361,7 @@ export default function HarmonySidebar() {
               height={64}
               style={{ objectFit: "contain" }}
             />
-          </Link>
+          </a>
         </Box>
 
         {/* Navigation Items */}
