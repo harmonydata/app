@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
 import AlertDialogSlide from "./Dialog";
 import InlineFeedback from "./InlineFeedback";
+import InstrumentSimilarities from "./InstrumentSimilarities";
 import ResultsOptions from "./ResultsOptions";
 
 import { parse, test } from "liqe";
@@ -312,6 +313,11 @@ export default function Results({
           severity="info"
           state={computedMatches && computedMatches.length > 0}
         />
+      )}
+
+      {/* New: Instrument-to-instrument similarities */}
+      {apiData && apiData.instrumentSimilarities && (
+        <InstrumentSimilarities similarities={apiData.instrumentSimilarities} />
       )}
       {topics && topics.length > 0 && (
         <Card
