@@ -32,7 +32,23 @@ export default function Results({
   const [uniqueInstruments, setUniqueInstruments] = useState([]);
   ReactGA.send({ hitType: "pageview", page: "/model", title: "Model" });
 
-  // Helper function to get discovery app path
+  // Get current domain for dynamic links
+  const getCurrentDomain = () => {
+    if (typeof window !== "undefined") {
+      // Handle local development with different ports
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        // React app runs on port 3000, DiscoveryNext runs on port 3222
+        return "http://localhost:3222";
+      }
+      return window.location.origin;
+    }
+    return "https://harmonydata.ac.uk"; // fallback for SSR
+  };
+
+  // Get the correct path for DiscoveryNext links
   const getDiscoveryNextPath = (path) => {
     if (typeof window !== "undefined") {
       // Handle local development - DiscoveryNext is on root
@@ -480,42 +496,42 @@ export default function Results({
                 Discover:
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, justifyContent: "center" }}>
-                {topics.length > 0 && (
-                  <Chip
-                    label="Studies with matching topics"
-                    component="a"
-                    href={`${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
-                    target="HarmonyDiscovery"
-                    clickable
-                    sx={{
-                      cursor: "pointer",
-                      "&:hover": {
-                        backgroundColor: "action.hover",
-                      },
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  />
-                )}
-                {uniqueInstruments.length > 0 && (
-                  <Chip
-                    label="Studies using the same instruments"
-                    component="a"
-                    href={`${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
-                    target="HarmonyDiscovery"
-                    clickable
-                    sx={{
-                      cursor: "pointer",
-                      "&:hover": {
-                        backgroundColor: "action.hover",
-                      },
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  />
-                )}
+              {topics.length > 0 && (
+                <Chip
+                  label="Studies with matching topics"
+                  component="a"
+                  href={`${getCurrentDomain()}${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {uniqueInstruments.length > 0 && (
+                <Chip
+                  label="Studies using the same instruments"
+                  component="a"
+                  href={`${getCurrentDomain()}${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
               </Box>
               <Typography variant="caption" sx={{ visibility: "hidden" }}>
                 Placeholder

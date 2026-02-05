@@ -21,7 +21,23 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
   // const [isFlipped, setIsFlipped] = useState(false);
   const [menuElement, setMenuElement] = useState(null);
 
-  // Helper function to get discovery app path
+  // Get current domain for dynamic links
+  const getCurrentDomain = () => {
+    if (typeof window !== "undefined") {
+      // Handle local development with different ports
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        // React app runs on port 3000, DiscoveryNext runs on port 3222
+        return "http://localhost:3222";
+      }
+      return window.location.origin;
+    }
+    return "https://harmonydata.ac.uk"; // fallback for SSR
+  };
+
+  // Get the correct path for DiscoveryNext links
   const getDiscoveryNextPath = (path) => {
     if (typeof window !== "undefined") {
       // Handle local development - DiscoveryNext is on root
@@ -51,7 +67,7 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
     }
     
     const queryString = params.toString();
-    return `${getDiscoveryNextPath("/")}${queryString ? `?${queryString}` : ""}`;
+    return `${getCurrentDomain()}${getDiscoveryNextPath("/")}${queryString ? `?${queryString}` : ""}`;
   };
 
   const openMenu = (event) => {
