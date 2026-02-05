@@ -7,6 +7,8 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
+  Tooltip,
+  Link,
 } from "@mui/material";
 import "react-circular-progressbar/dist/styles.css";
 import MatchCircle from "./MatchCircle";
@@ -18,6 +20,52 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
   const theme = useTheme()
   // const [isFlipped, setIsFlipped] = useState(false);
   const [menuElement, setMenuElement] = useState(null);
+
+  // Helper function to get discovery app path
+  const getDiscoveryNextPath = (path) => {
+    if (typeof window !== "undefined") {
+      // Handle local development - DiscoveryNext is on root
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        return path;
+      }
+      // Production - DiscoveryNext is under /search
+      return `/search${path}`;
+    }
+    return `/search${path}`; // fallback for SSR
+  };
+
+  // Build discovery URL with topics and instruments from this match
+  const getDiscoveryUrl = () => {
+    const params = new URLSearchParams();
+    
+    // Add topics if available
+    const topics = [];
+    if (Q1.topics_strengths) {
+      topics.push(...Object.keys(Q1.topics_strengths));
+    }
+    if (Q2.topics_strengths) {
+      topics.push(...Object.keys(Q2.topics_strengths));
+    }
+    const uniqueTopics = [...new Set(topics)];
+    uniqueTopics.forEach(topic => params.append("topics", topic));
+    
+    // Add instruments if available
+    const instruments = [];
+    if (Q1.instrument && Q1.instrument.name) {
+      instruments.push(Q1.instrument.name);
+    }
+    if (Q2.instrument && Q2.instrument.name) {
+      instruments.push(Q2.instrument.name);
+    }
+    const uniqueInstruments = [...new Set(instruments)];
+    uniqueInstruments.forEach(instrument => params.append("instruments", instrument));
+    
+    const queryString = params.toString();
+    return `${getDiscoveryNextPath("/")}${queryString ? `?${queryString}` : ""}`;
+  };
 
   const openMenu = (event) => {
     event.stopPropagation();
@@ -72,7 +120,41 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
           {Q1.instrument && Q1.instrument.name} - Q{Q1.question_no}
         </Typography>
       </Box>
-      <Box sx={{ width: "4em", margin: "0.5rem" }}>
+      <Box 
+        sx={{ 
+          width: "4em", 
+          margin: "0.5rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 0.5,
+        }}
+      >
+        <Tooltip title="Search for studies using these items">
+          <Link
+            href={getDiscoveryUrl()}
+            target="HarmonyDiscovery"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textDecoration: "none",
+            }}
+          >
+            <img
+              src="/app/harmony.png"
+              alt="Harmony Logo"
+              style={{
+                height: "1.5rem",
+                width: "auto",
+                cursor: "pointer",
+              }}
+            />
+          </Link>
+        </Tooltip>
         <MatchCircle percentage={percentage} />
       </Box>
       <Box

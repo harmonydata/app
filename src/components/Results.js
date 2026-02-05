@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Paper, Card, Stack, Box, Link, Typography } from "@mui/material";
+import { Paper, Card, Stack, Box, Link, Typography, Chip } from "@mui/material";
 import MatchUnit from "./MatchUnit";
 import { useParams } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
@@ -29,7 +29,24 @@ export default function Results({
   const { getPublicHarmonisations, reportMisMatch } = useData();
   const [savedError, setSavedError] = useState(null);
   const [topics, setTopics] = useState([]);
+  const [uniqueInstruments, setUniqueInstruments] = useState([]);
   ReactGA.send({ hitType: "pageview", page: "/model", title: "Model" });
+
+  // Helper function to get discovery app path
+  const getDiscoveryNextPath = (path) => {
+    if (typeof window !== "undefined") {
+      // Handle local development - DiscoveryNext is on root
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        return path; // e.g., "/" becomes "/"
+      }
+      // Production - DiscoveryNext is under /search
+      return `/search${path}`; // e.g., "/" becomes "/search/"
+    }
+    return `/search${path}`; // fallback for SSR
+  };
 
   const getQuestion = useCallback(
     (qidx) => {
@@ -241,6 +258,30 @@ export default function Results({
             .flat()
         ),
       ]);
+      
+      // Extract unique instrument names
+      const instruments = [
+        ...new Set(
+          cm
+            .map((m) => {
+              const q = getQuestion(m.qi);
+              const mq = getQuestion(m.mqi);
+              let inst = [];
+              if (q.instrument && q.instrument.name) {
+                inst.push(q.instrument.name);
+              }
+              if (mq.instrument && mq.instrument.name) {
+                inst.push(mq.instrument.name);
+              }
+              return inst;
+            })
+            .flat()
+            .filter(Boolean)
+        ),
+      ];
+      setUniqueInstruments(instruments);
+    } else {
+      setUniqueInstruments([]);
     }
   }, [resultsOptions, apiData, setComputedMatches, getQuestion]);
 
@@ -393,6 +434,76 @@ export default function Results({
               </Typography>
             </Box>
           </Stack>
+        </Card>
+      )}
+      {/* Discovery Card - Harmony Discovery Links */}
+      {(topics.length > 0 || uniqueInstruments.length > 0) && (
+        <Card
+          variant="outlined"
+          sx={{
+            display: "flex",
+            width: "100%",
+            padding: "1rem",
+            margin: "0 0 1rem 0",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <img
+            style={{ height: "3rem", width: "unset" }}
+            src="/app/harmony.png"
+            alt="Harmony Logo"
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+              flex: 1,
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+              Discover:
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {topics.length > 0 && (
+                <Chip
+                  label="Studies with matching topics"
+                  component="a"
+                  href={`${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {uniqueInstruments.length > 0 && (
+                <Chip
+                  label="Studies using the same instruments"
+                  component="a"
+                  href={`${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+            </Box>
+          </Box>
         </Card>
       )}
       {computedMatches &&
