@@ -23,6 +23,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { useData } from "../contexts/DataContext";
+import ComingSoonDialog from "./ComingSoonDialog";
 const settings = ["My Harmony", "Logout"];
 
 const SettingsIcons = {
@@ -34,6 +35,8 @@ function HarmonyAppBar() {
   const [apiVersion, setApiVersion] = React.useState(null);
   const [allModels, setAllModels] = React.useState();
   const [error, setError] = React.useState(null);
+  const [comingSoonOpen, setComingSoonOpen] = React.useState(false);
+  const [comingSoonFeature, setComingSoonFeature] = React.useState("");
   const {
     currentUser,
     logout,
@@ -75,6 +78,11 @@ function HarmonyAppBar() {
 
   const handleUserMenuClick = (menuItem) => {
     switch (menuItem) {
+      case "My Harmony":
+        handleCloseUserMenu();
+        setComingSoonFeature("My Harmony");
+        setComingSoonOpen(true);
+        break;
       case "Logout":
         handleCloseUserMenu();
         console.log("logging out");
@@ -267,6 +275,11 @@ function HarmonyAppBar() {
           </Menu>
         </Box>
       </Box>
+      <ComingSoonDialog
+        open={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        featureName={comingSoonFeature}
+      />
     </AppBar>
   );
 }

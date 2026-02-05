@@ -147,6 +147,11 @@ export default function HarmonySidebar() {
 
   const handleUserMenuClick = (menuItem) => {
     switch (menuItem) {
+      case "My Harmony":
+        handleCloseUserMenu();
+        setComingSoonFeature("My Harmony");
+        setComingSoonOpen(true);
+        break;
       case "Logout":
         handleCloseUserMenu();
         console.log("logging out");
