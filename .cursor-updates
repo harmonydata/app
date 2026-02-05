@@ -1,4 +1,4 @@
 # Cursor Updates
 
-- Added discovery card below Catalog mental health card with Harmony logo and discovery chips for topics and instruments that link to the discovery app
-- Added Harmony logo above match percentage in each match results card with tooltip linking to discovery search
+- Added discovery card below Catalog mental health card with Harmony logo and discovery chips for topics and instruments that link to the discovery app (layout matches Catalog card with logo on one side, content on the other)
+- Added Harmony logo above match percentage in each match results card with tooltip linking to discovery search using query parameter with both question texts

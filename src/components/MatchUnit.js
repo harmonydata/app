@@ -37,31 +37,18 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
     return `/search${path}`; // fallback for SSR
   };
 
-  // Build discovery URL with topics and instruments from this match
+  // Build discovery URL with both question texts as query
   const getDiscoveryUrl = () => {
     const params = new URLSearchParams();
     
-    // Add topics if available
-    const topics = [];
-    if (Q1.topics_strengths) {
-      topics.push(...Object.keys(Q1.topics_strengths));
-    }
-    if (Q2.topics_strengths) {
-      topics.push(...Object.keys(Q2.topics_strengths));
-    }
-    const uniqueTopics = [...new Set(topics)];
-    uniqueTopics.forEach(topic => params.append("topics", topic));
+    // Combine both question texts for the query
+    const queryText = [Q1.question_text, Q2.question_text]
+      .filter(Boolean)
+      .join(" ");
     
-    // Add instruments if available
-    const instruments = [];
-    if (Q1.instrument && Q1.instrument.name) {
-      instruments.push(Q1.instrument.name);
+    if (queryText) {
+      params.set("query", queryText);
     }
-    if (Q2.instrument && Q2.instrument.name) {
-      instruments.push(Q2.instrument.name);
-    }
-    const uniqueInstruments = [...new Set(instruments)];
-    uniqueInstruments.forEach(instrument => params.append("instruments", instrument));
     
     const queryString = params.toString();
     return `${getDiscoveryNextPath("/")}${queryString ? `?${queryString}` : ""}`;

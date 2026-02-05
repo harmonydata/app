@@ -443,67 +443,85 @@ export default function Results({
           sx={{
             display: "flex",
             width: "100%",
-            padding: "1rem",
+            height: { xs: "10rem", sm: "8rem" },
+            padding: "0.5rem",
             margin: "0 0 1rem 0",
+            justifyContent: "space-between",
             alignItems: "center",
-            gap: 2,
+            textAlign: "center",
           }}
         >
-          <img
-            style={{ height: "3rem", width: "unset" }}
-            src="/app/harmony.png"
-            alt="Harmony Logo"
-          />
-          <Box
+          <Stack
+            direction={"row"}
+            spacing={2}
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              flex: 1,
+              height: "100%",
+              width: "100%",
+              justifyContent: "space-around",
+              alignItems: "center",
             }}
           >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              Discover:
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {topics.length > 0 && (
-                <Chip
-                  label="Studies with matching topics"
-                  component="a"
-                  href={`${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
-                  target="HarmonyDiscovery"
-                  clickable
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
-              )}
-              {uniqueInstruments.length > 0 && (
-                <Chip
-                  label="Studies using the same instruments"
-                  component="a"
-                  href={`${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
-                  target="HarmonyDiscovery"
-                  clickable
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
-              )}
+            <img
+              style={{ height: "4rem", width: "unset" }}
+              src="/app/harmony.png"
+              alt="Harmony Logo"
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                height: "100%",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                Discover:
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, justifyContent: "center" }}>
+                {topics.length > 0 && (
+                  <Chip
+                    label="Studies with matching topics"
+                    component="a"
+                    href={`${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
+                    target="HarmonyDiscovery"
+                    clickable
+                    sx={{
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                )}
+                {uniqueInstruments.length > 0 && (
+                  <Chip
+                    label="Studies using the same instruments"
+                    component="a"
+                    href={`${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
+                    target="HarmonyDiscovery"
+                    clickable
+                    sx={{
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "action.hover",
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                )}
+              </Box>
+              <Typography variant="caption" sx={{ visibility: "hidden" }}>
+                Placeholder
+              </Typography>
             </Box>
-          </Box>
+          </Stack>
         </Card>
       )}
       {computedMatches &&
