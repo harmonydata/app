@@ -29,5 +29,9 @@ export function simplifyApi(apiResult, apiCall) {
     });
     instruments.push(instrument);
   });
-  return { instruments: instruments };
+  // Pass through instrument-to-instrument similarities if present from API
+  // Expecting shape: [{ instrument_1_name, instrument_2_name, precision, recall, f1, ... }]
+  const instrumentSimilarities =
+    apiResult.instrument_to_instrument_similarities || [];
+  return { instruments: instruments, instrumentSimilarities };
 }
