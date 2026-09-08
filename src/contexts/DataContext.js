@@ -61,6 +61,7 @@ export function DataProvider({ children }) {
 
           // Handle other non-200 responses
           if (!response.ok) {
+            console.error("GET failed:", url, "status:", response.status);
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -88,6 +89,7 @@ export function DataProvider({ children }) {
         try {
           const controller = new AbortController();
           const id = setTimeout(() => controller.abort(), timeout);
+          console.log("GET:", url);
           response = await fetch(url, {
             method: "GET",
             mode: "cors",
