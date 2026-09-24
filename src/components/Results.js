@@ -9,6 +9,10 @@ import ResultsOptions from "./ResultsOptions";
 
 import { parse, test } from "liqe";
 
+// Discovery's instruments filter needs its own instrument names; Harmony's
+// (e.g. "SCARED English (child)") match nothing, so hide the chip for now.
+const SHOW_INSTRUMENTS_CHIP = false;
+
 export default function Results({
   apiData,
   setApiData,
@@ -453,7 +457,8 @@ export default function Results({
         </Card>
       )}
       {/* Discovery Card - Harmony Discovery Links */}
-      {(topics.length > 0 || uniqueInstruments.length > 0) && (
+      {(topics.length > 0 ||
+        (SHOW_INSTRUMENTS_CHIP && uniqueInstruments.length > 0)) && (
         <Card
           variant="outlined"
           sx={{
@@ -514,7 +519,7 @@ export default function Results({
                   }}
                 />
               )}
-              {uniqueInstruments.length > 0 && (
+              {SHOW_INSTRUMENTS_CHIP && uniqueInstruments.length > 0 && (
                 <Chip
                   label="Studies using the same instruments"
                   component="a"
