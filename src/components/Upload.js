@@ -217,34 +217,62 @@ export default function Upload({
       );
     });
     Promise.all(frp)
-      .then((allFiles) => {
-        toast.promise(
-          new Promise((resolve, reject) => {
-            parse(allFiles)
-              .then((data) => {
-                const newFileInfos = [...fileInfos];
-                // Load each returned file / instrument in the data
-                data.forEach((instrument) => {
-                  newFileInfos.push(instrument);
-                });
-                setFileInfos(newFileInfos);
-                resolve(true);
-              })
-              .catch((e) => {
-                console.log(e);
-                setParseError(true);
-                reject("Parse Error");
-              })
-              .finally((_) => {
-                syncFileInfos();
+      .then(async (allFiles) => {
+        // Parse ONE file per API call, in series (issue #61). A single
+        // /text/parse call carrying many large PDFs times out: Tika can take
+        // well over a minute per big or scanned PDF, and the old 15s timeout
+        // with 3 retries then re-sent the whole batch while the server was
+        // still working on the first attempt. One file per call keeps each
+        // request inside the proxy limits, shows progress, and lets the good
+        // files land even if one bad scan fails. The API caches parsed files
+        // by content, so re-uploading an already-parsed file is instant.
+        const progress = (i) =>
+          allFiles.length === 1
+            ? `Parsing ${allFiles[0].file_name} - this may take a while`
+            : `Parsing ${i + 1} of ${allFiles.length}: ${allFiles[i].file_name} - this may take a while`;
+        const toastId = toast.loading(progress(0));
+        const newFileInfos = [...fileInfos];
+        const failed = [];
+        let parsedCount = 0;
+        for (let i = 0; i < allFiles.length; i++) {
+          toast.update(toastId, { render: progress(i) });
+          try {
+            const data = await parse([allFiles[i]]);
+            if (Array.isArray(data) && data.length) {
+              data.forEach((instrument) => {
+                newFileInfos.push(instrument);
               });
-          }),
-          {
-            pending: "Parsing files - this may take a while",
-            success: "Success!",
-            error: "Something went wrong - please try again",
+              // Show each file as soon as it lands rather than at the end
+              setFileInfos([...newFileInfos]);
+              parsedCount++;
+            } else {
+              failed.push(`${allFiles[i].file_name} (no questions found)`);
+            }
+          } catch (e) {
+            console.log(e);
+            failed.push(allFiles[i].file_name);
           }
-        );
+        }
+        syncFileInfos();
+        if (failed.length === 0) {
+          toast.update(toastId, {
+            render: "Success!",
+            type: "success",
+            isLoading: false,
+            autoClose: 3000,
+          });
+        } else {
+          setParseError(true);
+          toast.update(toastId, {
+            render:
+              parsedCount === 0
+                ? "Something went wrong - please try again"
+                : `Parsed ${parsedCount} of ${allFiles.length} files - could not parse ${failed.join(", ")}`,
+            type: parsedCount === 0 ? "error" : "warning",
+            isLoading: false,
+            autoClose: 8000,
+          });
+        }
       })
       .catch((e) => {
         console.log(e);

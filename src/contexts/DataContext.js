@@ -26,9 +26,13 @@ export function DataProvider({ children }) {
     framework: "huggingface",
     model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   });
-  const retryablePostData = ({ url = "", data = {}, timeout = 8000 }) => {
+  const retryablePostData = ({
+    url = "",
+    data = {},
+    timeout = 8000,
+    retries = 3,
+  }) => {
     return new Promise(async (resolve, reject) => {
-      var retries = 3;
       var response;
       while (retries > 0) {
         try {
@@ -125,11 +129,16 @@ export function DataProvider({ children }) {
     });
   };
 
-  const parse = (allFiles) => {
+  // Parse is called with ONE file at a time by Upload.js (see issue #61).
+  // Tika can take well over a minute on a large or scanned PDF, so the
+  // per-call timeout is generous and there is no blind retry: re-sending a
+  // big PDF that just timed out only piles more work onto the server.
+  const parse = (allFiles, timeout = 180000) => {
     return retryablePostData({
       url: process.env.REACT_APP_API_PARSE,
       data: allFiles,
-      timeout: 15000,
+      timeout: timeout,
+      retries: 1,
     });
   };
   const match = useCallback(

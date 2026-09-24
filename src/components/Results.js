@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Paper, Card, Stack, Box, Link, Typography } from "@mui/material";
+import { Paper, Card, Stack, Box, Link, Typography, Chip } from "@mui/material";
 import MatchUnit from "./MatchUnit";
 import { useParams } from "react-router-dom";
 import { useData } from "../contexts/DataContext";
@@ -8,6 +8,10 @@ import InlineFeedback from "./InlineFeedback";
 import ResultsOptions from "./ResultsOptions";
 
 import { parse, test } from "liqe";
+
+// Discovery's instruments filter needs its own instrument names; Harmony's
+// (e.g. "SCARED English (child)") match nothing, so hide the chip for now.
+const SHOW_INSTRUMENTS_CHIP = false;
 
 export default function Results({
   apiData,
@@ -29,7 +33,40 @@ export default function Results({
   const { getPublicHarmonisations, reportMisMatch } = useData();
   const [savedError, setSavedError] = useState(null);
   const [topics, setTopics] = useState([]);
+  const [uniqueInstruments, setUniqueInstruments] = useState([]);
   ReactGA.send({ hitType: "pageview", page: "/model", title: "Model" });
+
+  // Get current domain for dynamic links
+  const getCurrentDomain = () => {
+    if (typeof window !== "undefined") {
+      // Handle local development with different ports
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        // React app runs on port 3000, DiscoveryNext runs on port 3222
+        return "http://localhost:3222";
+      }
+      return window.location.origin;
+    }
+    return "https://harmonydata.ac.uk"; // fallback for SSR
+  };
+
+  // Get the correct path for DiscoveryNext links
+  const getDiscoveryNextPath = (path) => {
+    if (typeof window !== "undefined") {
+      // Handle local development - DiscoveryNext is on root
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        return path; // e.g., "/" becomes "/"
+      }
+      // Production - DiscoveryNext is under /search
+      return `/search${path}`; // e.g., "/" becomes "/search/"
+    }
+    return `/search${path}`; // fallback for SSR
+  };
 
   const getQuestion = useCallback(
     (qidx) => {
@@ -241,6 +278,30 @@ export default function Results({
             .flat()
         ),
       ]);
+      
+      // Extract unique instrument names
+      const instruments = [
+        ...new Set(
+          cm
+            .map((m) => {
+              const q = getQuestion(m.qi);
+              const mq = getQuestion(m.mqi);
+              let inst = [];
+              if (q.instrument && q.instrument.name) {
+                inst.push(q.instrument.name);
+              }
+              if (mq.instrument && mq.instrument.name) {
+                inst.push(mq.instrument.name);
+              }
+              return inst;
+            })
+            .flat()
+            .filter(Boolean)
+        ),
+      ];
+      setUniqueInstruments(instruments);
+    } else {
+      setUniqueInstruments([]);
     }
   }, [resultsOptions, apiData, setComputedMatches, getQuestion]);
 
@@ -390,6 +451,95 @@ export default function Results({
                 >
                   Search for studies exploring these topics
                 </Link>
+              </Typography>
+            </Box>
+          </Stack>
+        </Card>
+      )}
+      {/* Discovery Card - Harmony Discovery Links */}
+      {(topics.length > 0 ||
+        (SHOW_INSTRUMENTS_CHIP && uniqueInstruments.length > 0)) && (
+        <Card
+          variant="outlined"
+          sx={{
+            display: "flex",
+            width: "100%",
+            height: { xs: "10rem", sm: "8rem" },
+            padding: "0.5rem",
+            margin: "0 0 1rem 0",
+            justifyContent: "space-between",
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          <Stack
+            direction={"row"}
+            spacing={2}
+            sx={{
+              height: "100%",
+              width: "100%",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+          >
+            <img
+              style={{ height: "4rem", width: "unset" }}
+              src="/app/harmony.png"
+              alt="Harmony Logo"
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                height: "100%",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                Discover:
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, justifyContent: "center" }}>
+              {topics.length > 0 && (
+                <Chip
+                  label="Studies with matching topics"
+                  component="a"
+                  href={`${getCurrentDomain()}${getDiscoveryNextPath("/")}?${topics.map(t => `topics=${encodeURIComponent(t)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {SHOW_INSTRUMENTS_CHIP && uniqueInstruments.length > 0 && (
+                <Chip
+                  label="Studies using the same instruments"
+                  component="a"
+                  href={`${getCurrentDomain()}${getDiscoveryNextPath("/")}?${uniqueInstruments.map(i => `instruments=${encodeURIComponent(i)}`).join("&")}`}
+                  target="HarmonyDiscovery"
+                  clickable
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              </Box>
+              <Typography variant="caption" sx={{ visibility: "hidden" }}>
+                Placeholder
               </Typography>
             </Box>
           </Stack>
