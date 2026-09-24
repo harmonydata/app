@@ -12,6 +12,9 @@ import { parse, test } from "liqe";
 // Discovery's instruments filter needs its own instrument names; Harmony's
 // (e.g. "SCARED English (child)") match nothing, so hide the chip for now.
 const SHOW_INSTRUMENTS_CHIP = false;
+// Discovery ANDs keyword filters, so sending every matched topic (often 6+)
+// returns no studies. Hidden until the link sends a narrower set.
+const SHOW_TOPICS_CHIP = false;
 
 export default function Results({
   apiData,
@@ -457,7 +460,7 @@ export default function Results({
         </Card>
       )}
       {/* Discovery Card - Harmony Discovery Links */}
-      {(topics.length > 0 ||
+      {((SHOW_TOPICS_CHIP && topics.length > 0) ||
         (SHOW_INSTRUMENTS_CHIP && uniqueInstruments.length > 0)) && (
         <Card
           variant="outlined"
@@ -501,7 +504,7 @@ export default function Results({
                 Discover:
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, justifyContent: "center" }}>
-              {topics.length > 0 && (
+              {SHOW_TOPICS_CHIP && topics.length > 0 && (
                 <Chip
                   label="Studies with matching topics"
                   component="a"
