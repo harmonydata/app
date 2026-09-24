@@ -300,14 +300,14 @@ export function DataProvider({ children }) {
     return addDoc(collection(db, "mismatches"), m);
   };
   const prepForFireStore = (harmonisation) => {
-    harmonisation.apiData.instruments.map((instrument) =>
-      instrument.questions.map(
-        (question) =>
-          //This is a circular reference but can't be stored
-          delete question["instrument"]
+    //question.instrument is a circular reference so can't be stored; drop it
+    //from a copy rather than deleting it from the live apiData, which the
+    //results page (and Excel export) still rely on after a share or save
+    harmonisation.apiData = JSON.parse(
+      JSON.stringify(harmonisation.apiData, (key, value) =>
+        key === "instrument" ? undefined : value
       )
     );
-    harmonisation.apiData = JSON.parse(JSON.stringify(harmonisation.apiData));
     console.log("prepped");
     console.log(harmonisation);
     return harmonisation;
