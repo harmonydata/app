@@ -51,7 +51,7 @@ function HarmonyAppBar() {
       .then((ver) => {
         setApiVersion(ver);
       })
-      .catch((e) => setError("ERROR: API unreachable"));
+      .catch((e) => setError("ERROR: API unreachable (version)"));
   }, [getVersion]);
 
   React.useEffect(() => {
@@ -59,7 +59,7 @@ function HarmonyAppBar() {
       .then((models) => {
         setAllModels(models);
       })
-      .catch((e) => setError("ERROR: API unreachable"));
+      .catch((e) => setError("ERROR: API unreachable (models)"));
   }, [getModels]);
 
   const handleModelSelect = (event) => {
