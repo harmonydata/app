@@ -30,7 +30,7 @@ function App() {
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({
-    threshold: [70, 100],
+    threshold: [30, 100],
     searchTerm: "",
     intraInstrument: false,
   });
